@@ -16,10 +16,10 @@ type BlogPost struct {
 //json tags for marshalling and unmarshalling
 type BlogPostResponse struct {
 	
-	ID int     `json:"title"`
-	Title string
-	Content string
-	Tags []string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID int              `json:"id"`
+	Title string        `json:"title"`
+	Content string		`json:"content"`
+	Tags []string       `json:"tags"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
