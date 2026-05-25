@@ -12,7 +12,7 @@ import (
 
 
 
-func Database() {
+func Database() *sql.DB{
 
 
 	//Loaded the .env file
@@ -51,4 +51,6 @@ func Database() {
 	}
 	fmt.Println("Database Connection Established.")
 
+	//return db for imports
+	return db
 }

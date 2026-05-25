@@ -2,8 +2,9 @@ package database
 
 import (
 	"database/sql"
-	"log"
 	"time"
+	"github.com/MohdKat/Blogging-Platform-API.git/Internal/models"
+	"fmt"
 )
 
 //Simpler not optimal design,
@@ -21,26 +22,38 @@ func CreateTable(db *sql.DB) (string, error){
 	)`
 
 	_, err := db.Exec(query);if err != nil {
-		log.Fatal(err)
+		return fmt.Sprintf("Error could not execute query: %s\n", err), err
 	}
-	Id = 1
+
+	return "Table created! Success!", nil
 }
 
 
-//Query for creating a Blog post
-func CreateBpost(post BlogPost, db *sql.DB) {
+//Query for creating a Blog post that returns a pointer to a BlogPostResponse
+//that can marshall our response into JSON object
+func CreateBpost(post models.BlogPost, db *sql.DB) (*models.BlogPostResponse, error){
 	
 	query := `INSERT INTO BlogPosts (title, content, tags) VALUES (post.Title, post.Content,post.Tags) Returning id, createdAt, updatedAt`
 
 	var pk int              
-	var CreatedAT time.Time 
-	var UpdatedAt time.Time 
+	var CrtdAt time.Time 
+	var UpdtAt time.Time 
 
-	err := db.QueryRow(query, post.Title, post.Content, post.Tags).Scan(&pk, &CreatedAT, &UpdatedAt)
+	err := db.QueryRow(query, post.Title, post.Content, post.Tags).Scan(&pk, &CrtdAt, &UpdtAt)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	PostResponse:= BlogPostResponse{}
+
+	return &models.BlogPostResponse{
+
+		ID: pk,
+		Title: post.Title,
+		Content: post.Content,
+		Tags: post.Tags,
+		CreatedAt: CrtdAt,
+		UpdatedAt: UpdtAt,
+	}, nil
+	
 }
 
