@@ -1,9 +1,10 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 )
+
+
 
 func CreateBlog() http.HandlerFunc{
 	return func(w http.ResponseWriter, req *http.Request) {
