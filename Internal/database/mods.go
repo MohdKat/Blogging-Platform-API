@@ -62,3 +62,26 @@ func CreateBpost(post models.BlogPost, db *sql.DB) (*models.BlogPostResponse, er
 	
 }
 
+func  UpdateBpost(id int,post models.BlogPost, db *sql.DB) (*models.BlogPostResponse, error){
+
+	query := `UPDATE BlogPosts SET title = $1, content = $2, tags = $3, updatedAt = CURRENT_DATE WHERE id = $4 Returning createdAt, updatedAt'`
+	var CrtdAt time.Time
+	var UpdtAt time.Time
+
+	err := db.QueryRow(query, post.Title, post.Content, post.Tags, id).Scan(&CrtdAt, &UpdtAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.BlogPostResponse{
+
+		ID: id,
+		Title: post.Title,
+		Content: post.Content,
+		Tags: post.Tags,
+		CreatedAt: CrtdAt,
+		UpdatedAt: UpdtAt, 
+	}, nil
+	
+}
+

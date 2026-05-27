@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/MohdKat/Blogging-Platform-API.git/Internal/database"
 	"github.com/MohdKat/Blogging-Platform-API.git/Internal/models"
@@ -56,11 +57,40 @@ func CreateBlog(db *sql.DB) http.HandlerFunc{
 	}
 }
 
-// func UpdateBlog() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
+func UpdateBlog(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-// 	}
-// }
+		//Getting the id and converting it into a int
+		str_id := r.PathValue("id")
+		id, err := strconv.Atoi(str_id)
+		if err != nil {
+			http.Error(w, "Error: Not a calid ID !", http.StatusBadRequest)
+			return
+		}
+
+
+		//Unmarshalling the http request to pass it to the query
+		var post models.BlogPost
+		err = json.NewDecoder(r.Body).Decode(&post)
+		if err != nil {
+			http.Error(w, "Error could not unmarshal request!", http.StatusInternalServerError)
+			return 
+		}
+
+
+		//Updating Blog post in database and fetching the BlogPostresponse struct instance
+		updated_blog, err := database.UpdateBpost(id, post, db)
+		if err != nil {
+			http.Error(w, "Could not update blog post!", http.StatusInternalServerError)
+			return
+		}
+
+
+		//encoding the updated blogResponse entity into the http response
+		json.NewEncoder(w).Encode(updated_blog)
+
+	}
+}
 
 // func DeleteBlog() http.HandlerFunc {
 // 	return func(w http.ResponseWriter, req *http.Request) {
