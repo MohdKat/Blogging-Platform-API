@@ -98,3 +98,28 @@ func DeleteBpost(id int, db *sql.DB) (error) {
 
 	return nil
 }
+
+func GetBpost(id int, db *sql.DB) (*models.BlogPostResponse, error){
+	query := `SELECT * FROM BlogPosts WHERE id = $1 Returning title, content, tags, createdAt, updatedAt`
+
+	var ttl string //title
+	var cntnt string //content
+	var tgs []string //tags
+	var CrtdAt time.Time //createdAt
+	var UptdAt time.Time //updatedAt
+	
+	
+	err := db.QueryRow(query, id).Scan(&ttl, &cntnt, &tgs, &CrtdAt, &UptdAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.BlogPostResponse{
+		ID: id,
+		Title: ttl,
+		Content: cntnt,
+		Tags: tgs,
+		CreatedAt: CrtdAt,
+		UpdatedAt: UptdAt,
+	}, nil
+}

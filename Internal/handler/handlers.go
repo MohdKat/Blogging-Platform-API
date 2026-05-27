@@ -122,11 +122,31 @@ func DeleteBlog(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-// func GetBlog() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
+func GetBlog(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-// 	}
-// }
+		str_id := r.PathValue("id")
+		id, err := strconv.Atoi(str_id)
+		if err != nil {
+			http.Error(w, "Invalid id !", http.StatusBadRequest)
+			return
+		}
+
+		post, err := database.GetBpost(id, db)
+		if err != nil {
+			http.Error(w, "This blog post doesn't exist! ", http.StatusInternalServerError)
+		}
+
+
+		w.Header().Set("Content_type","application/json")
+		w.WriteHeader(http.StatusFound)
+		err = json.NewEncoder(w).Encode(post)
+		if err != nil {
+			http.Error(w, "Server Error!", http.StatusInternalServerError)
+		}
+
+	}
+}
 
 // func GetAllBlogs() http.HandlerFunc {
 // 	return func(w http.ResponseWriter, r *http.Request) {
