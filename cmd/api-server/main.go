@@ -32,6 +32,7 @@ func main() {
 
 	mux.HandleFunc("POST /blogs", handler.CreateBlog(db))
 	mux.HandleFunc("PUT /blogs/{id}", handler.UpdateBlog(db))
+	mux.HandleFunc("DELETE /blogs/{id}", handler.DeleteBlog(db))
 
 	log.Println("Starting server on port :8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))

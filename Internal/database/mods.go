@@ -64,7 +64,7 @@ func CreateBpost(post models.BlogPost, db *sql.DB) (*models.BlogPostResponse, er
 
 func  UpdateBpost(id int,post models.BlogPost, db *sql.DB) (*models.BlogPostResponse, error){
 
-	query := `UPDATE BlogPosts SET title = $1, content = $2, tags = $3, updatedAt = CURRENT_DATE WHERE id = $4 Returning createdAt, updatedAt'`
+	query := `UPDATE BlogPosts SET title = $1, content = $2, tags = $3, updatedAt = CURRENT_DATE WHERE id = $4 Returning createdAt, updatedAt`
 	var CrtdAt time.Time
 	var UpdtAt time.Time
 
@@ -85,3 +85,16 @@ func  UpdateBpost(id int,post models.BlogPost, db *sql.DB) (*models.BlogPostResp
 	
 }
 
+func DeleteBpost(id int, db *sql.DB) (error) {
+	query := `DELETE FROM BlogPosts WHERE id = $1 Returning createedAt, updatedAt`
+
+	var CrtdAt time.Time
+	var UpdtAt time.Time
+
+	err := db.QueryRow(query, id).Scan(&CrtdAt, &UpdtAt)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

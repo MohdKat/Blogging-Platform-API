@@ -86,17 +86,41 @@ func UpdateBlog(db *sql.DB) http.HandlerFunc {
 		}
 
 
-		//encoding the updated blogResponse entity into the http response
-		json.NewEncoder(w).Encode(updated_blog)
+
+		//writing the http response
+		w.Header().Set("Content_type", "application/json")
+		w.WriteHeader(http.StatusContinue)
+
+		//encoding the updated blogResponse entity into and writing it into the http response
+		err = json.NewEncoder(w).Encode(updated_blog)
+		if err != nil {
+			http.Error(w, "Coud not marshal the response!", http.StatusInternalServerError)
+		}
 
 	}
 }
 
-// func DeleteBlog() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, req *http.Request) {
+func DeleteBlog(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
 
-// 	}
-// }
+		//Getting the id for the DeleteBpost function(Query/Db operation)
+		str_id := req.PathValue("id")
+		id, err := strconv.Atoi(str_id)
+		if err != nil {
+			http.Error(w, "Not a valid ID!", http.StatusBadRequest)
+		}
+
+		err = database.DeleteBpost(id, db)
+		if err != nil {
+			http.Error(w, "Could not find the id! ", http.StatusBadRequest)
+		}
+
+
+		//writing the http response
+		w.Header().Set("Content_type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
 
 // func GetBlog() http.HandlerFunc {
 // 	return func(w http.ResponseWriter, r *http.Request) {
