@@ -148,8 +148,21 @@ func GetBlog(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-// func GetAllBlogs() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-		
-// 	}
-// }
+func GetAllBlogs(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		posts, err := database.GetAllBposts(db)
+		if err != nil {
+			http.Error(w, "Blog posts unavailable!", http.StatusInternalServerError)
+		}
+
+		w.Header().Set("Content_type", "application/json")
+		w.WriteHeader(http.StatusFound)
+		for _, post := range posts {
+			err = json.NewEncoder(w).Encode(post)
+			if err != nil {
+				http.Error(w, "Could not marshal a blog post !", http.StatusInternalServerError)
+				return
+			}
+		}
+	}
+}

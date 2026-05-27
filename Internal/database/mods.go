@@ -123,3 +123,42 @@ func GetBpost(id int, db *sql.DB) (*models.BlogPostResponse, error){
 		UpdatedAt: UptdAt,
 	}, nil
 }
+
+func GetAllBposts(db *sql.DB) ([]models.BlogPostResponse, error){
+	query := `SELECT * FROM BlogPosts Returning id, title, content, tags, createdAt, updatedaAt`
+
+	var posts []models.BlogPostResponse
+
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+
+
+		var Id int //id
+		var ttl string //title
+		var cntnt string //content
+		var tgs []string //tags
+		var CrtdAt time.Time //createdAt
+		var UptdAt time.Time //updatedAt
+
+		err := rows.Scan(&Id, &ttl, &cntnt, &tgs, &CrtdAt, &UptdAt)
+		if err != nil {
+			return nil, err
+		}
+
+		posts = append(posts, models.BlogPostResponse{
+			ID: Id,
+			Title: ttl,
+			Content: cntnt,
+			Tags: tgs,
+			CreatedAt: CrtdAt,
+			UpdatedAt: UptdAt,
+		})
+	}
+
+	return posts, nil
+}
