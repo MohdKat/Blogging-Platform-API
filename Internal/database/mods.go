@@ -86,12 +86,9 @@ func  UpdateBpost(id int,post models.BlogPost, db *sql.DB) (*models.BlogPostResp
 }
 
 func DeleteBpost(id int, db *sql.DB) (error) {
-	query := `DELETE FROM BlogPosts WHERE id = $1 Returning createedAt, updatedAt`
+	query := `DELETE FROM BlogPosts WHERE id = $1`
 
-	var CrtdAt time.Time
-	var UpdtAt time.Time
-
-	err := db.QueryRow(query, id).Scan(&CrtdAt, &UpdtAt)
+	_, err := db.Exec(query, id)
 	if err != nil {
 		return err
 	}
@@ -100,7 +97,7 @@ func DeleteBpost(id int, db *sql.DB) (error) {
 }
 
 func GetBpost(id int, db *sql.DB) (*models.BlogPostResponse, error){
-	query := `SELECT * FROM BlogPosts WHERE id = $1 Returning title, content, tags, createdAt, updatedAt`
+	query := `SELECT title, content, tags, createdAt, updatedAt FROM BlogPosts WHERE id = $1`
 
 	var ttl string //title
 	var cntnt string //content
@@ -109,7 +106,7 @@ func GetBpost(id int, db *sql.DB) (*models.BlogPostResponse, error){
 	var UptdAt time.Time //updatedAt
 	
 	
-	err := db.QueryRow(query, id).Scan(&ttl, &cntnt, &tgs, &CrtdAt, &UptdAt)
+	err := db.QueryRow(query, id).Scan(&ttl, &cntnt, pq.Array(&tgs), &CrtdAt, &UptdAt)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +122,7 @@ func GetBpost(id int, db *sql.DB) (*models.BlogPostResponse, error){
 }
 
 func GetAllBposts(db *sql.DB) ([]models.BlogPostResponse, error){
-	query := `SELECT * FROM BlogPosts Returning id, title, content, tags, createdAt, updatedaAt`
+	query := `SELECT id, title, content, tags, createdAt, updatedAt FROM BlogPosts`
 
 	var posts []models.BlogPostResponse
 
@@ -135,17 +132,16 @@ func GetAllBposts(db *sql.DB) ([]models.BlogPostResponse, error){
 	}
 	defer rows.Close()
 
+	var Id int //id
+	var ttl string //title
+	var cntnt string //content
+	var tgs []string //tags
+	var CrtdAt time.Time //createdAt
+	var UptdAt time.Time //updatedAt
+
 	for rows.Next() {
 
-
-		var Id int //id
-		var ttl string //title
-		var cntnt string //content
-		var tgs []string //tags
-		var CrtdAt time.Time //createdAt
-		var UptdAt time.Time //updatedAt
-
-		err := rows.Scan(&Id, &ttl, &cntnt, &tgs, &CrtdAt, &UptdAt)
+		err := rows.Scan(&Id, &ttl, &cntnt, pq.Array(&tgs), &CrtdAt, &UptdAt)
 		if err != nil {
 			return nil, err
 		}

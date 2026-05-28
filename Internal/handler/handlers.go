@@ -112,9 +112,9 @@ func DeleteBlog(db *sql.DB) http.HandlerFunc {
 
 		err = database.DeleteBpost(id, db)
 		if err != nil {
+			log.Printf("There is an issue in the query: %v", err)
 			http.Error(w, "Could not find the id! ", http.StatusBadRequest)
 		}
-
 
 		//writing the http response
 		w.Header().Set("Content_type", "application/json")
